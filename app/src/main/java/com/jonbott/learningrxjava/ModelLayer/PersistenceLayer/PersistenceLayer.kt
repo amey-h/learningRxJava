@@ -1,5 +1,6 @@
 package com.jonbott.learningrxjava.ModelLayer.PersistenceLayer
 
+import android.annotation.SuppressLint
 import androidx.room.*
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.jonbott.learningrxjava.Common.disposedBy
@@ -47,11 +48,10 @@ class PersistenceLayer {
 
     fun loadAllPhotoDescriptions(finished: PhotoDescriptionLambda) { //async api
 
-        databaseReady.subscribe(onNext@ { isReady ->
+        databaseReady.subscribe onNext@{ isReady ->
             if (!isReady) return@onNext
-
             getDescriptionsWithCoroutines(finished)
-        }).disposedBy(bag)
+        }.disposedBy(bag)
     }
 
     private fun getDescriptionsWithCoroutines(finished: PhotoDescriptionLambda) {
@@ -67,6 +67,7 @@ class PersistenceLayer {
         }
     }
 
+    @SuppressLint("CheckResult")
     private fun getDescriptions(finished: PhotoDescriptionLambda) {
         LearningRxJavaApplication.database.photoDescriptionDao()
                 .getDescriptions()

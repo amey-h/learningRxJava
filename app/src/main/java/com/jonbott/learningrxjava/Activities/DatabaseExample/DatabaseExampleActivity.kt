@@ -5,7 +5,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.jonbott.learningrxjava.Activities.DatabaseExample.Recycler.PhotoDescriptionViewAdapter
+import com.jonbott.learningrxjava.Common.disposedBy
 import com.jonbott.learningrxjava.R
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_database_example.*
 
 
@@ -15,9 +18,18 @@ class DatabaseExampleActivity : AppCompatActivity() {
 
     lateinit var adapter: PhotoDescriptionViewAdapter
 
+    private val bag = CompositeDisposable()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_database_example)
+
+        presenter.photoDescriptions.observeOn(AndroidSchedulers.mainThread())
+            .subscribe{ descriptions ->
+                descriptions.forEach { println("result: $it") }
+                adapter.photoDescriptions.accept(descriptions.toMutableList())
+
+            }.disposedBy(bag)
 
         attachUI()
     }
@@ -45,6 +57,11 @@ class DatabaseExampleActivity : AppCompatActivity() {
 
     private fun rowTapped(position: Int) {
         println("🍄")
-        println(adapter.photoDescriptions[position])
+        println(adapter.photoDescriptions.value[position])
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        bag.clear()
     }
 }
