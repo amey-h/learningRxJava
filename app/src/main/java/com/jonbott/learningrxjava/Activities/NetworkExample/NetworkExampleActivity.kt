@@ -5,18 +5,28 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.jonbott.learningrxjava.Activities.NetworkExample.Recycler.MessageViewAdapter
+import com.jonbott.learningrxjava.Common.disposedBy
 import com.jonbott.learningrxjava.R
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_network_example.*
 
 class NetworkExampleActivity : AppCompatActivity() {
 
     private val presenter = NetworkExamplePresenter()
-    lateinit var adapter: MessageViewAdapter
 
+    private val bag = CompositeDisposable()
+
+    lateinit var adapter: MessageViewAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_network_example)
+
+        presenter.messages.observeOn(AndroidSchedulers.mainThread())
+            .subscribe { messages ->
+                adapter.messages.accept(messages)
+            }.disposedBy(bag)
 
         attachUI()
     }
@@ -44,7 +54,12 @@ class NetworkExampleActivity : AppCompatActivity() {
 
     private fun rowTapped(position: Int) {
         println("🍄")
-        println(adapter.messages[position])
+        println(adapter.messages.value[position])
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        bag.clear()
     }
 }
 
