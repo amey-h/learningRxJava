@@ -14,9 +14,7 @@ import kotlinx.android.synthetic.main.activity_network_example.*
 class NetworkExampleActivity : AppCompatActivity() {
 
     private val presenter = NetworkExamplePresenter()
-
     private val bag = CompositeDisposable()
-
     lateinit var adapter: MessageViewAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {

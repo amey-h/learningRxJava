@@ -2,9 +2,11 @@ package com.jonbott.learningrxjava.ModelLayer
 
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.jonbott.learningrxjava.ModelLayer.Entities.Message
+import com.jonbott.learningrxjava.ModelLayer.Entities.Person
 import com.jonbott.learningrxjava.ModelLayer.NetworkLayer.NetworkLayer
 import com.jonbott.learningrxjava.ModelLayer.PersistenceLayer.PersistenceLayer
 import com.jonbott.learningrxjava.ModelLayer.PersistenceLayer.PhotoDescription
+import io.reactivex.Observable
 
 class ModelLayer {
 
@@ -38,5 +40,9 @@ class ModelLayer {
 
     fun notifyError(error: String) {
         println("Network Error: $error")
+    }
+
+    fun loadInfoFor(people: List<Person>): Observable<List<String>> {
+        return networkLayer.loadInfoFor(people)
     }
 }
