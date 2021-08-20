@@ -25,7 +25,7 @@ class ThreadingExamplePresenter {
 //        thread(start = true){
 //            Thread.sleep(3000)
 
-        GlobalScope.launch(Dispatchers.Main) {
+        GlobalScope.launch {
             delay(3000)
 
             title.onNext("Friends Loaded")
@@ -52,9 +52,9 @@ class ThreadingExamplePresenter {
                     Friend("Dolly", "Delapaz"),
                     Friend("Juliane", "Jobin"))
 
-//            launch(UI) {
+            launch(Dispatchers.Main) {
                 friends.accept(newFriends)
-//            }
+            }
         }
     }
 }

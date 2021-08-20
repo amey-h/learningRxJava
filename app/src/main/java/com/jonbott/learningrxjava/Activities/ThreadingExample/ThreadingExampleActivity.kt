@@ -9,6 +9,9 @@ import com.jonbott.learningrxjava.R
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_threading_example.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 //Schedulers
 //https://android.jlelse.eu/rxjava-schedulers-what-when-and-how-to-use-it-6cfc27293add
@@ -34,24 +37,22 @@ class ThreadingExampleActivity : AppCompatActivity() {
     }
 
     private fun threadingExamples() {
-//        threading()
-        threading2()
+        threading()
+        //threading2()
     }
-
-
 
 
     private fun threading() {
         presenter.friends
 //                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { items ->
-                    println("🚦 current thread: ${Thread.currentThread().id}")
-                    println("⁉️🌲 is on UI thread: ${Thread.currentThread().id == mainThreadId}")
+            .subscribe { items ->
+                println("🚦 current thread: ${Thread.currentThread().id}")
+                println("⁉️🌲 is on UI thread: ${Thread.currentThread().id == mainThreadId}")
 
-//                    launch(UI) {
-                        updateList(items)
-//                    }
-                }.disposedBy(bag)
+                GlobalScope.launch(Dispatchers.Main) {
+                    updateList(items)
+                }
+            }.disposedBy(bag)
     }
 
     //discuss ObserveOn vs SubscribeOn
@@ -62,11 +63,11 @@ class ThreadingExampleActivity : AppCompatActivity() {
 //                .observeOn(AndroidSchedulers.mainThread())
 //                .observeOn(Schedulers.newThread())
 //                .subscribeOn(Schedulers.computation())
-                .subscribe{ result ->
-                    println("🚦 current thread: ${Thread.currentThread().id}")
-                    println("⁉️🐢 is on UI thread: ${Thread.currentThread().id == mainThreadId}")
-                    print("result: ${result}")
-                }.disposedBy(bag)
+            .subscribe { result ->
+                println("🚦 current thread: ${Thread.currentThread().id}")
+                println("⁉️🐢 is on UI thread: ${Thread.currentThread().id == mainThreadId}")
+                print("result: ${result}")
+            }.disposedBy(bag)
     }
 
     fun getResult(): Observable<String> {
@@ -74,11 +75,11 @@ class ThreadingExampleActivity : AppCompatActivity() {
 //            launch {
 //                delay(3000)
 
-                println("🚦 current thread: ${Thread.currentThread().id}")
-                println("⁉️🐖 is on UI thread: ${Thread.currentThread().id == mainThreadId}")
+            println("🚦 current thread: ${Thread.currentThread().id}")
+            println("⁉️🐖 is on UI thread: ${Thread.currentThread().id == mainThreadId}")
 
-                observer.onNext("some result")
-                observer.onComplete()
+            observer.onNext("some result")
+            observer.onComplete()
 //            }
         }
     }
@@ -94,12 +95,12 @@ class ThreadingExampleActivity : AppCompatActivity() {
 
     }
 
-    private fun updateList(items: List<Friend>){
-            val itemsArray = items.map { it.description }.toTypedArray()
+    private fun updateList(items: List<Friend>) {
+        val itemsArray = items.map { it.description }.toTypedArray()
 
-            adapter.clear()
-            adapter.addAll(*itemsArray)
-            adapter.notifyDataSetChanged()
+        adapter.clear()
+        adapter.addAll(*itemsArray)
+        adapter.notifyDataSetChanged()
     }
 
 
